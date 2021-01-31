@@ -62,4 +62,22 @@ public class DemoController {
         producer.sendTopicThree(message);
         return "SendMessageOKTopic3";
     }
+
+
+    @GetMapping("sendFanoutMsg")
+    public String sendFanoutMsg() {
+        DemoMessage message = DemoMessage.builder().msgId(UUID.randomUUID().toString())
+                .dateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .data("Hello, world, fanoutMsg !")
+                .build();
+        producer.sendFanoutMessage(message);
+        return "SendMessageOKFanout";
+    }
+
+    @GetMapping("sendHeaderMsg")
+    public String sendHeaderMsg() {
+        String message = "hello, world! header message!";
+        producer.sendHeaderAMsg(message);
+        return "SendMessageOKHeader.";
+    }
 }
