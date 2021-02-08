@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.CustomExchange;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.HeadersExchange;
@@ -12,6 +13,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableMBeanExport;
 
 /**
  *  rabbitmq 配置.
@@ -48,6 +50,15 @@ public class RabbitMQConfig {
     public static final String HEADERS_QUEUE_A = "headersQueueA";
     public static final String HEADERS_QUEUE_B = "headersQueueB";
     public static final String HEADERS_EXCHANGE = "headerExchange";
+
+    public static final String DELAY_EXCHANGE = "delayExchange";
+    public static final String DELAY_QUEUE = "delayQueue";
+    public static final String DELAY_KEY = "delayKey";
+
+    public static final String DELAY_DIRECT_EX = "delayDirectExchange";
+    public static final String DELAY_QUEUE2 = "delayQueue2";
+    public static final String DELAY_KEY2 = "delayKey2";
+
 
 
     /**
@@ -163,4 +174,50 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(headersQueueB()).to(headersExchange()).whereAll(headerMap).match();
     }
 
+
+    @Bean
+    public CustomExchange delayExchange() {
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-delayed-type", "direct");
+        //属性参数 交换机名称 交换机类型 是否持久化 是否自动删除 配置参数
+        return new CustomExchange(DELAY_EXCHANGE, "x-delayed-message",
+                true, false, args);
+    }
+
+    @Bean
+    public Queue delayQueue() {
+        //属性参数 队列名称 是否持久化
+        return new Queue(DELAY_QUEUE, true);
+    }
+
+
+    /**
+     * 给延时队列绑定交换机
+     */
+    @Bean
+    public Binding configureDelayBinding() {
+        return BindingBuilder.bind(delayQueue()).to(delayExchange()).with(DELAY_KEY).noargs();
+    }
+
+
+    @Bean
+    public DirectExchange delayDirectExchange() {
+        return new DirectExchange(DELAY_DIRECT_EX);
+    }
+
+    /**
+     *  not work. ?
+     */
+    @Bean
+    public Queue delayQueue2() {
+        Map<String, Object> map = new HashMap<>(4);
+        map.put("x-dead-letter-exchange", DELAY_DIRECT_EX);
+        map.put("x-dead-letter-routing-key", DELAY_KEY2);
+        return new Queue(DELAY_QUEUE2, true, false, false, map);
+    }
+
+    @Bean
+    public Binding configDelayBinging() {
+        return BindingBuilder.bind(delayQueue2()).to(delayDirectExchange()).with(DELAY_KEY2);
+    }
 }

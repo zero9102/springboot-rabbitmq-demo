@@ -48,6 +48,22 @@ public class Producer {
         rabbitTemplate.convertAndSend(RabbitMQConfig.HEADERS_EXCHANGE, null, obj);
     }
 
+    public void sendDelayMsg(DemoMessage message, int delayTimeMilliSeconds) {
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DELAY_EXCHANGE, RabbitMQConfig.DELAY_KEY,
+                message, msg -> {
+                    msg.getMessageProperties().setDelay(delayTimeMilliSeconds);
+                    return msg;
+                });
+    }
+
+    public void sendDelayMsg2(DemoMessage message, int delayTimeMilliSeconds) {
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DELAY_DIRECT_EX, RabbitMQConfig.DELAY_KEY2,
+                message, msg -> {
+                    msg.getMessageProperties().setExpiration("" + delayTimeMilliSeconds);
+                    return msg;
+                });
+    }
+
     private void sendMsg(String exchange, String keyQueue, DemoMessage message) {
         rabbitTemplate.convertAndSend(exchange, keyQueue,
                 message);

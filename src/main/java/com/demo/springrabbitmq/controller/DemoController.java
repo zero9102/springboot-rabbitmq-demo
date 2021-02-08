@@ -80,4 +80,24 @@ public class DemoController {
         producer.sendHeaderAMsg(message);
         return "SendMessageOKHeader.";
     }
+
+    @GetMapping("sendDelayMsg")
+    public String sendDelayMsg() {
+        DemoMessage message = DemoMessage.builder().msgId(UUID.randomUUID().toString())
+                .dateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .data("Hello, world, DelayMsg !")
+                .build();
+        producer.sendDelayMsg(message, 30000);
+        return "SendDelayMessageOK";
+    }
+
+    @GetMapping("sendDelayMsg2")
+    public String sendDelayMsg2() {
+        DemoMessage message = DemoMessage.builder().msgId(UUID.randomUUID().toString())
+                .dateTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .data("Hello, world, DelayMsg22 !")
+                .build();
+        producer.sendDelayMsg2(message, 30000);
+        return "SendDelayMessageOK2";
+    }
 }

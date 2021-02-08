@@ -73,4 +73,16 @@ public class Consumer {
         log.info("receive headerB msg: date: {}" , LocalDateTime.now());
         log.info("[receive headerB rabbit mq: {}", new String(demoMessage));
     }
+
+    @RabbitListener(queues = RabbitMQConfig.DELAY_QUEUE)
+    public void processDelayQueue(DemoMessage demoMessage) {
+        log.info("receive delayQueue msg: date: {}" , LocalDateTime.now());
+        log.info("[receive delayQueue rabbit mq: {}", demoMessage);
+    }
+
+    @RabbitListener(queues = RabbitMQConfig.DELAY_QUEUE2)
+    public void processDelayQueue2(DemoMessage demoMessage) {
+        log.info("receive delayQueue2 msg: date: {}" , LocalDateTime.now());
+        log.info("[receive delayQueue2 rabbit mq: {}", demoMessage);
+    }
 }
