@@ -80,7 +80,7 @@ public class Consumer {
         log.info("[receive delayQueue rabbit mq: {}", demoMessage);
     }
 
-    @RabbitListener(queues = RabbitMQConfig.DELAY_QUEUE2)
+    @RabbitListener(queues = RabbitMQConfig.DEAD_LETTER_QUEUE)
     public void processDelayQueue2(DemoMessage demoMessage) {
         log.info("receive delayQueue2 msg: date: {}" , LocalDateTime.now());
         log.info("[receive delayQueue2 rabbit mq: {}", demoMessage);

@@ -59,6 +59,10 @@ public class RabbitMQConfig {
     public static final String DELAY_QUEUE2 = "delayQueue2";
     public static final String DELAY_KEY2 = "delayKey2";
 
+    public static final String DEAD_LETTER_EXCHANGE = "deadLetterExchange";
+    public static final String DEAD_LETTER_QUEUE = "deadLetterQueue";
+    public static final String DEAD_LETTER_KEY = "deadLetterKey";
+
 
 
     /**
@@ -206,18 +210,45 @@ public class RabbitMQConfig {
     }
 
     /**
-     *  not work. ?
+     *  consumer to DEAD_LETER_QUEUE, not delay queue.
      */
     @Bean
     public Queue delayQueue2() {
-        Map<String, Object> map = new HashMap<>(4);
-        map.put("x-dead-letter-exchange", DELAY_DIRECT_EX);
-        map.put("x-dead-letter-routing-key", DELAY_KEY2);
-        return new Queue(DELAY_QUEUE2, true, false, false, map);
+        Map<String, Object> args = new HashMap<>(4);
+        args.put("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE);
+        args.put("x-dead-letter-routing-key", DEAD_LETTER_KEY);
+        // 过期时间10s, 可以在消息属性中设置， 一般不这样设置， 这样容易导致一个队列的延迟时间是10s
+        args.put("x-message-ttl", 10000);
+        return new Queue(DELAY_QUEUE2, true, false, false, args);
     }
 
     @Bean
     public Binding configDelayBinging() {
         return BindingBuilder.bind(delayQueue2()).to(delayDirectExchange()).with(DELAY_KEY2);
+    }
+
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DEAD_LETTER_EXCHANGE);
+    }
+
+    /**
+     * 死信接收队列
+     *
+     * @return
+     */
+    @Bean
+    public Queue deadLetterQueue() {
+        return new Queue(DEAD_LETTER_QUEUE);
+    }
+
+    /**
+     * 死信交换机绑定消费队列
+     *
+     * @return
+     */
+    @Bean
+    public Binding userOrderReceiveBinding() {
+        return BindingBuilder.bind(deadLetterQueue()).to(deadLetterExchange()).with(DEAD_LETTER_KEY);
     }
 }
