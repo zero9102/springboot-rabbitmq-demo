@@ -218,6 +218,7 @@ public class RabbitMQConfig {
         args.put("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE);
         args.put("x-dead-letter-routing-key", DEAD_LETTER_KEY);
         // 过期时间10s, 可以在消息属性中设置， 一般不这样设置， 这样容易导致一个队列的延迟时间是10s
+        // 如果messge 属性中设置了Expiration， 那么此处生效。
         args.put("x-message-ttl", 10000);
         return new Queue(DELAY_QUEUE2, true, false, false, args);
     }
