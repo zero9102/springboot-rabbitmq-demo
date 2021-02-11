@@ -217,8 +217,10 @@ public class RabbitMQConfig {
         Map<String, Object> args = new HashMap<>(4);
         args.put("x-dead-letter-exchange", DEAD_LETTER_EXCHANGE);
         args.put("x-dead-letter-routing-key", DEAD_LETTER_KEY);
-        // 过期时间10s, 可以在消息属性中设置， 一般不这样设置， 这样容易导致一个队列的延迟时间是10s
-        // 如果messge 属性中设置了Expiration， 那么此处生效。
+        // 过期时间10s, 可以在消息属性中设置， 也可以设置队列的过期时间。一般不设置， 这样容易导致一个队列的延迟时间是10s
+        // 如果messge 属性中也设置了Expiration，那么较小的生效。
+        // https://www.rabbitmq.com/ttl.html
+        // When both a per-queue and a per-message TTL are specified, the lower value between the two will be chosen.
         args.put("x-message-ttl", 10000);
         return new Queue(DELAY_QUEUE2, true, false, false, args);
     }
